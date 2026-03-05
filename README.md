@@ -95,3 +95,5 @@ Modules:
 * Top Module: 4-bit Ripple Carry Adder (```rca_4bit.v```)
 
 I have created a testbench file ```tb_rca_4bit.v``` for the functional verificataion of the design. Test cases include multiple combinations of inputs to validate sum output and carry propagation. The outputs for the simulation are shown below:
+![iverilog output](./Images/iverilog-output.png)<br>
+![waveform](./Images/waveform1.png)<br>
