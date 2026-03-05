@@ -91,7 +91,7 @@ The design is implemented in Verilog using hierarchical modules.
 
 Modules:
 
-• Full Adder  (```full_adder.v```)
-• Top Module: 4-bit Ripple Carry Adder (```rca_4bit.v```)
+* Full Adder  (```full_adder.v```)
+* Top Module: 4-bit Ripple Carry Adder (```rca_4bit.v```)
 
 I have created a testbench file ```tb_rca_4bit.v``` for the functional verificataion of the design. Test cases include multiple combinations of inputs to validate sum output and carry propagation. The outputs for the simulation are shown below:
