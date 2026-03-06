@@ -1,0 +1,75 @@
+
+Cell sky130_fd_sc_hs__maj3_1 (0) disconnected node: A
+Cell sky130_fd_sc_hs__maj3_1 (0) disconnected node: B
+Cell sky130_fd_sc_hs__maj3_1 (0) disconnected node: C
+Cell sky130_fd_sc_hs__maj3_1 (0) disconnected node: X
+Cell sky130_fd_sc_hs__maj3_1 (0) disconnected node: VNB
+Cell sky130_fd_sc_hs__maj3_1 (0) disconnected node: VPWR
+Warning: Equate pins:  cell sky130_fd_sc_hs__maj3_1 is a placeholder, treated as a black box.
+
+Subcircuit pins:
+Circuit 1: sky130_fd_sc_hs__maj3_1         |Circuit 2: sky130_fd_sc_hs__maj3_1         
+-------------------------------------------|-------------------------------------------
+A                                          |A                                          
+B                                          |B                                          
+C                                          |C                                          
+X                                          |X                                          
+VNB                                        |(no matching pin)                          
+VPWR                                       |(no matching pin)                          
+---------------------------------------------------------------------------------------
+Cell pin lists are equivalent.
+Device classes sky130_fd_sc_hs__maj3_1 and sky130_fd_sc_hs__maj3_1 are equivalent.
+
+Cell sky130_fd_sc_hs__xnor2_1 (0) disconnected node: A
+Cell sky130_fd_sc_hs__xnor2_1 (0) disconnected node: B
+Cell sky130_fd_sc_hs__xnor2_1 (0) disconnected node: Y
+Cell sky130_fd_sc_hs__xnor2_1 (0) disconnected node: VNB
+Cell sky130_fd_sc_hs__xnor2_1 (0) disconnected node: VPWR
+Warning: Equate pins:  cell sky130_fd_sc_hs__xnor2_1 is a placeholder, treated as a black box.
+
+Subcircuit pins:
+Circuit 1: sky130_fd_sc_hs__xnor2_1        |Circuit 2: sky130_fd_sc_hs__xnor2_1        
+-------------------------------------------|-------------------------------------------
+A                                          |A                                          
+B                                          |B                                          
+Y                                          |Y                                          
+VNB                                        |(no matching pin)                          
+VPWR                                       |(no matching pin)                          
+---------------------------------------------------------------------------------------
+Cell pin lists are equivalent.
+Device classes sky130_fd_sc_hs__xnor2_1 and sky130_fd_sc_hs__xnor2_1 are equivalent.
+Flattening unmatched subcell sky130_fd_sc_hs__tapvpwrvgnd_1 in circuit rca_4bit (0)(3 instances)
+
+Subcircuit summary:
+Circuit 1: rca_4bit                        |Circuit 2: rca_4bit                        
+-------------------------------------------|-------------------------------------------
+sky130_fd_sc_hs__maj3_1 (4)                |sky130_fd_sc_hs__maj3_1 (4)                
+sky130_fd_sc_hs__xnor2_1 (8)               |sky130_fd_sc_hs__xnor2_1 (8)               
+Number of devices: 12                      |Number of devices: 12                      
+Number of nets: 21                         |Number of nets: 21                         
+---------------------------------------------------------------------------------------
+Netlists match uniquely.
+
+Subcircuit pins:
+Circuit 1: rca_4bit                        |Circuit 2: rca_4bit                        
+-------------------------------------------|-------------------------------------------
+S[0]                                       |S[0]                                       
+S[3]                                       |S[3]                                       
+S[1]                                       |S[1]                                       
+S[2]                                       |S[2]                                       
+Cout                                       |Cout                                       
+Cin                                        |Cin                                        
+B[0]                                       |B[0]                                       
+A[0]                                       |A[0]                                       
+A[1]                                       |A[1]                                       
+A[2]                                       |A[2]                                       
+B[1]                                       |B[1]                                       
+B[2]                                       |B[2]                                       
+A[3]                                       |A[3]                                       
+B[3]                                       |B[3]                                       
+---------------------------------------------------------------------------------------
+Cell pin lists are equivalent.
+Device classes rca_4bit and rca_4bit are equivalent.
+
+Final result: Circuits match uniquely.
+.

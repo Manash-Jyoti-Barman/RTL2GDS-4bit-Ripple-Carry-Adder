@@ -1,0 +1,32 @@
+* NGSPICE file created from rca_4bit.ext - technology: sky130A
+
+* Black-box entry subcircuit for sky130_fd_sc_hs__maj3_1 abstract view
+.subckt sky130_fd_sc_hs__maj3_1 A B C X VNB VPWR
+.ends
+
+* Black-box entry subcircuit for sky130_fd_sc_hs__xnor2_1 abstract view
+.subckt sky130_fd_sc_hs__xnor2_1 A B Y VNB VPWR
+.ends
+
+* Black-box entry subcircuit for sky130_fd_sc_hs__tapvpwrvgnd_1 abstract view
+.subckt sky130_fd_sc_hs__tapvpwrvgnd_1 VGND VPWR
+.ends
+
+.subckt rca_4bit A[0] A[1] A[2] A[3] B[0] B[1] B[2] B[3] Cin Cout S[0] S[1] S[2] S[3]
+X_49_ A[2] B[2] _49_/C _52_/C _50_/VNB _52_/VPB sky130_fd_sc_hs__maj3_1
+X_48_ _49_/C _48_/B S[2] _52_/VNB _52_/VPB sky130_fd_sc_hs__xnor2_1
+X_47_ A[2] B[2] _48_/B _50_/VNB _52_/VPB sky130_fd_sc_hs__xnor2_1
+X_46_ A[1] B[1] _46_/C _49_/C _50_/VNB _51_/VPB sky130_fd_sc_hs__maj3_1
+X_45_ _46_/C _45_/B S[1] _51_/VNB _51_/VPB sky130_fd_sc_hs__xnor2_1
+X_44_ A[1] B[1] _45_/B _50_/VNB _51_/VPB sky130_fd_sc_hs__xnor2_1
+X_43_ Cin A[0] B[0] _46_/C _50_/VNB _52_/VPB sky130_fd_sc_hs__maj3_1
+X_42_ A[0] _42_/B S[0] _50_/VNB _51_/VPB sky130_fd_sc_hs__xnor2_1
+X_41_ Cin B[0] _42_/B _52_/VNB _52_/VPB sky130_fd_sc_hs__xnor2_1
+XTAP_0 TAP_0/VGND _52_/VPB sky130_fd_sc_hs__tapvpwrvgnd_1
+XTAP_1 _50_/VNB TAP_2/VPWR sky130_fd_sc_hs__tapvpwrvgnd_1
+XTAP_2 TAP_2/VGND TAP_2/VPWR sky130_fd_sc_hs__tapvpwrvgnd_1
+X_52_ A[3] B[3] _52_/C Cout _52_/VNB _52_/VPB sky130_fd_sc_hs__maj3_1
+X_51_ _52_/C _51_/B S[3] _51_/VNB _51_/VPB sky130_fd_sc_hs__xnor2_1
+X_50_ A[3] B[3] _51_/B _50_/VNB _52_/VPB sky130_fd_sc_hs__xnor2_1
+.ends
+
