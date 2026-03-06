@@ -198,10 +198,85 @@ initialize_floorplan -die_area {0 0 20 20} -core_area {2 2 18 18} -sites "unit"
 * **Core Area**: The core area is the region inside the die where standard cells are placed. (2,2)	Lower-left corner of the chip and (18,18)	Upper-right corner of the chip.
 
 ![floorplan](./Images/floorplan.png)<br>
-![tracks](./Images/tracks.png)<br>
+Next step is defining the routing tracks. Routing tracks are regularly spaced horizontal and vertical lines that form a grid across the chip which helps determine the grid locations where metal wires can be placed during routing. The ```make_tracks.tcl``` script automatically generates routing tracks for each metal layer using the technology parameters.
+```tcl
+source /home/manashjb/OpenROAD-flow-scripts/flow/platforms/sky130hs/make_tracks.tcl
+```
+The preferred routing directions of each metal layer are defined in the SKY130 technology LEF file (```sky130_fd_sc_hs.tlef```):
+| Layer | Type               | Preferred Direction |
+| ----- | ------------------ | ------------------- |
+| li1   | Local interconnect | horizontal          |
+| met1  | Metal 1            | horizontal          |
+| met2  | Metal 2            | vertical            |
+| met3  | Metal 3            | horizontal          |
+| met4  | Metal 4            | vertical            |
+| met5  | Metal 5            | horizontal          |
+
+![tracks](./Images/tracks.png)<br> 
+Tapcells prevent latch-up in CMOS circuits by connecting nwell to VDD and p-substrate to GND. The tapcells provide periodic substrate contacts across the layout. The tapcell used in your design is ```sky130_fd_sc_hs__tapvpwrvgnd_1```. This standard cell includes a well contact, connections to VPWR (VDD) and connections to VGND (GND). The standard cell is part of the SKY130HS standard cell library.
+```tcl
+tapcell -tapcell_master sky130_fd_sc_hs__tapvpwrvgnd_1 -distance 14
+```
+
 ![tapcells](./Images/tapcells.png)<br>
+Then Input and output pins were placed automatically along the core boundary with this command
+```tcl
+place_pins -hor_layers met3 -ver_layers met2
+```
+OpenROAD reported:
+```
+Number of available slots : 66
+Number of IO pins         : 14
+Estimated IO wirelength   : 187.04 µm
+```
 ![iopins](./Images/iopins.png)<br>
+Global Placement determines approximate positions of all movable standard cells inside the core area. The command for global placememt of the standard cells:
+```tcl
+global_placement -density 0.9
+```
+``-density 0.9`` specifies the target placement density, which indicates the maximum fraction of the core area that can be occupied by cells. 0.9 density means maximum allowed utilization is 90% where Core utilization = (standard cell area + macro cells area)/ total core area 
+
 ![global placement](./Images/globalplace.png)<br>
+After global placement, cells may overlap or may not align with legal placement rows. Detailed placement corrects these issues. Detailed placement ensures that cells align with placement sites, no cells overlap, placement rows are respected and design rules are satisfied. Command is:
+```tcl
+detailed_placement
+```
+Half-Perimeter Wirelength (HPWL) is the most widely used metric in VLSI physical design for estimating the total routing length of a net during the placement stage.
+```HPWL = (max_x - min_x) + (max_y - min_y)```
+
+**Lower HPWL → shorter wires → better design.**
+
+From my placement and routing results:
+| Stage     | HPWL     |
+| --------- | -------- |
+| Before detailed placing  | 162.7 µm |
+| After detailed placing | 255.9 µm |
+
+The HPWL increased slightly because after global placement, cells can be placed anywhere — even overlapping but after detailed placement, cells had to align with placement rows and overlaps were removed.
+
 ![detailed placement](./Images/detailplace.png)<br>
+Before moving to Routing, the tool must verify that every pin can be accessed by routing layers:
+```tcl
+pin_access
+```
+My Results:
+| Parameter               | Value |
+| ----------------------- | ----- |
+| Pins analyzed           | 14    |
+| Unique cell types       | 6     |
+| Valid via access points | 66    |
+| Pins without access     | 0     |
 
+![pins](./Images/pins.png)<br>
+For this very small design, the OpenROAD global router occasionally fails due to limited routing tracks in the small core area. The detailed router was able to complete routing successfully without global routing guides. OpenROAD uses the TritonRoute router which can bypass the global route and can run detailed route directly. It the final physical design stage that creates metallic interconnections between standard cells, macros, and I/O pins based on a netlist. The command used is:
+```tcl
+detailed_route
+```
+My final routed layout has:
 
+* 256 µm total wire length
+* 80 vias
+* 0 design rule violations
+
+![route](./Images/route.png)<br>
+![finalnotrack](./Images/finalnotrack.png)<br>
