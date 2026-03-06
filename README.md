@@ -37,6 +37,7 @@ Both expressions are logically equivalent. In ASIC implementations, the majority
 - [2. Design Specifications](#2-Design-Specifications)
 - [3. RTL Design and Simulations](#3-RTL-Design)
 - [4. Synthesis](#4-Synthesis)
+- [5. Floorplanning](#5-Floorplanning)
 
 ## 1. Tools and PDK
 ### 1.1 Icarus Verilog
@@ -161,3 +162,46 @@ write_json rca_4bit_synth.json
 show -format dot -prefix rca_4bit
 ```
 Flattening was used in this design to remove the hierarchical structure created by the four full_adder modules inside the rca_4bit top module. Since the ripple carry adder is a relatively small circuit, flattening the hierarchy simplifies the design by merging all submodules into a single top-level module. This allows the synthesis tool to optimize the logic across module boundaries and generate a netlist that directly contains only SKY130 standard cells. A flattened netlist also makes verification and comparison with the physical layout easier during LVS and helps clearly observe the final gate-level implementation of the circuit.
+![synthesized graph](./synth/rca_4bit.png)<br>
+
+## 5. Floorplanning
+Here we go with the physical design, the stage of the ASIC implementation flow where the technology-mapped gate-level netlist is transformed into a physical layout that can be fabricated on silicon. During this stage, standard cells are placed within the chip area and routing resources are allocated to interconnect the cells. Starting with the very important step of Floorplanning.
+
+In the floorplanning, I defined the physical boundaries of the chip layout and determines where standard cells will be placed. Also, establishing the die size, core placement region, and routing margins targeting efficient placement of standard cells and minimum routing congestion.
+
+#### Inputs Required for Floorplanning
+1. Synthesized Netlist 
+   ```rca_4bit_synth.v```
+2. Technology LEF 
+   ```sky130_fd_sc_hs.tlef```
+   ```sky130_fd_sc_hs_merged.lef```
+3. Liberty Timing Library
+   ```sky130_fd_sc_hs__tt_025C_1v80.lib```
+
+The following TCL commands are used in OpenROAD to read these input files and to link the design:
+
+```tcl
+#Read Netlist and library files
+read_verilog ../synth/rca_4bit_synth.v
+read_lef sky130_fd_sc_hs.tlef
+read_lef sky130_fd_sc_hs_merged.lef
+read_liberty sky130_fd_sc_hs__tt_025C_1v80.lib
+
+#Link the Design
+link_design rca_4bit
+```
+Then the chiip dimension and placement regions are specied
+```tcl
+initialize_floorplan -die_area {0 0 20 20} -core_area {2 2 18 18} -sites "unit"
+```
+* **Die Area**: The die area represents the total physical area of the chip. It includes everything inside the chip boundary. (0,0)	Lower-left corner of the chip and (20,20)	Upper-right corner of the chip. 
+* **Core Area**: The core area is the region inside the die where standard cells are placed. (2,2)	Lower-left corner of the chip and (18,18)	Upper-right corner of the chip.
+
+![floorplan](./Images/floorplan.png)<br>
+![tracks](./Images/tracks.png)<br>
+![tapcells](./Images/tapcells.png)<br>
+![iopins](./Images/iopins.png)<br>
+![global placement](./Images/globalplace.png)<br>
+![detailed placement](./Images/detailplace.png)<br>
+
+
