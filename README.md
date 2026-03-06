@@ -30,12 +30,13 @@ Both expressions are logically equivalent. In ASIC implementations, the majority
   - [1.2 GTK Wave](#12-GTKwave)
   - [1.3 OpenLane](#13-OpenLane)
   - [1.4 Yosys](#14-Yosys)
-  - [1.5 Yosys](#15-Yosys)
+  - [1.5 OpenROAD](#15-OpenROAD)
   - [1.6 Magic](#16-Magic)
   - [1.7 Netgen](#17-Netgen)
   - [1.8 Skywater Technology](#18-Skywater-Technology)
 - [2. Design Specifications](#2-Design-Specifications)
 - [3. RTL Design and Simulations](#3-RTL-Design)
+- [4. Synthesis](#4-Synthesis)
 
 ## 1. Tools and PDK
 ### 1.1 Icarus Verilog
@@ -96,4 +97,67 @@ Modules:
 
 I have created a testbench file ```tb_rca_4bit.v``` for the functional verificataion of the design. Test cases include multiple combinations of inputs to validate sum output and carry propagation. The outputs for the simulation are shown below:
 ![iverilog output](./Images/iverilog-output.png)<br>
-![waveform](./Images/waveform1.png)<br>
+![waveform](./Images/waveform.png)<br>
+
+## 4. Synthesis
+Logic synthesis is the process of transforming a Register Transfer Level (RTL) description written in a Hardware Description Language (HDL) into a gate-level netlist composed of technology-specific standard cells. The main goals of synthesis are:
+
+1. Functional correctness
+2. Technology mapping
+3. Optimization for Area, Power and Timing
+
+In this project, synthesis is performed using Yosys, mapping the Verilog implementation of the 4-bit Ripple Carry Adder to cells from the SkyWater SKY130 PDK standard cell library. The resulting gate-level netlist is used as the input for the physical design stages such as floorplanning, placement, and routing.
+
+### Inputs for Synthesis Process
+1. High-Level Description (RTL Design)
+
+> This represents the functional description of the digital circuit written using a Hardware Description Language (HDL), such as Verilog. It defines how the circuit should behave logically by specifying the inputs, outputs, and the relationships between them before the design is converted into actual hardware gates.
+
+```full_adder.v```
+
+```rca_4bit.v```
+
+2. Constraints
+
+> Constraints define the design requirements that guide the synthesis and optimization process. These can include timing requirements (such as maximum delay or clock period), area limitations, power limits, and other performance-related specifications.
+
+No explicit constraint file was used in this project. Since the design is a purely combinational circuit, the synthesis was performed without specifying timing constraints. The synthesis tool optimized the design using the default parameters provided by the standard cell library.
+
+3. Library Information
+
+> The standard cell library provides the set of logic gates and digital building blocks that the synthesis tool uses to implement the circuit. It also contains detailed information about each cell, including propagation delay, power consumption, pin characteristics, and physical area. The Liberty (.lib) file belongs to the SKY130 High-Speed Standard Cell Library is used by the synthesis tool to map the RTL design into actual logic gates during technology mapping.
+
+```sky130_fd_sc_hs__tt_025C_1v80.lib```
+
+Commands used in the yosys are:
+
+```tcl
+# Step 1: Load the standard cell library
+read_liberty -lib /home/manashjb/OpenROAD-flow-scripts/flow/platforms/sky130hs/lib/sky130_fd_sc_hs__tt_025C_1v80.lib
+
+# Step 2: Read RTL Verilog source files
+read_verilog ../rtl/full_adder.v
+read_verilog ../rtl/rca_4bit.v
+
+# Step 3: Run synthesis
+synth -top rca_4bit
+
+# Step 4: Flatten the design hierarchy
+flatten
+
+# Step 5: Technology mapping using ABC
+abc -liberty /home/manashjb/OpenROAD-flow-scripts/flow/platforms/sky130hs/lib/sky130_fd_sc_hs__tt_025C_1v80.lib
+
+# Step 6: Print synthesis statistics
+stat
+
+# Step 7: Write the synthesized gate-level netlist
+write_verilog rca_4bit_synth.v
+
+# Step 8: Export the synthesized design in JSON format
+write_json rca_4bit_synth.json
+
+#Step 9: Generate GraphViz DOT file
+show -format dot -prefix rca_4bit
+```
+Flattening was used in this design to remove the hierarchical structure created by the four full_adder modules inside the rca_4bit top module. Since the ripple carry adder is a relatively small circuit, flattening the hierarchy simplifies the design by merging all submodules into a single top-level module. This allows the synthesis tool to optimize the logic across module boundaries and generate a netlist that directly contains only SKY130 standard cells. A flattened netlist also makes verification and comparison with the physical layout easier during LVS and helps clearly observe the final gate-level implementation of the circuit.
