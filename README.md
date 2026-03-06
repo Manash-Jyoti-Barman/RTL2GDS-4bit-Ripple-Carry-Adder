@@ -38,6 +38,7 @@ Both expressions are logically equivalent. In ASIC implementations, the majority
 - [3. RTL Design and Simulations](#3-RTL-Design)
 - [4. Synthesis](#4-Synthesis)
 - [5. Floorplanning](#5-Floorplanning)
+- [6. DRC and LVS](#6-DRC-and-LVS)
 
 ## 1. Tools and PDK
 ### 1.1 Icarus Verilog
@@ -280,3 +281,52 @@ My final routed layout has:
 
 ![route](./Images/route.png)<br>
 ![finalnotrack](./Images/finalnotrack.png)<br>
+
+## 6. DRC and LVS
+**Design Rule Check (DRC)**
+
+DRC verifies that the layout follows the fabrication rules specified by the technology. It checks constraints such as minimum wire width, spacing, and enclosure to ensure the design can be manufactured reliably.
+
+**Layout Versus Schematic (LVS)**
+
+LVS verifies that the generated layout matches the original schematic or synthesized netlist. It compares the extracted connections from the layout with the design netlist to ensure correct functionality and connectivity.
+
+For DRC and LVS, Open source tools Magic and Netgen are used. First the layout is visualized in Magic VLSI from ``rca_4bit.def`` and .lef files from ``sky130_fd_sc_hs`` library. 
+
+Magic VLSI is opened with SKY130 technology PDK using the commmand: 
+```bash
+magic -T /home/manashjb/EDA/open_pdks/sky130/sky130A/libs.tech/magic/sky130A.tech &
+```
+![magic](./layout/magic_layout.png)<br>
+The commands used in the Magic command terminal:
+```tcl
+lef read /home/manashjb/OpenROAD-flow-scripts/flow/platforms/sky130hs/lef/sky130_fd_sc_hs.tlef
+lef read /home/manashjb/OpenROAD-flow-scripts/flow/platforms/sky130hs/lef/sky130_fd_sc_hs_merged.lef
+
+def read ../floorplan/rca_4bit.def
+
+drc check
+drc count
+
+extract all
+ext2spice lvs
+ext2spice
+```
+My design passed the DRC and I got 0 DRC errors.
+
+After the commands ``ext2spice lvs`` and ``ext2spice``, a .spice netlist file is generated i.e. ``rca_4bit.spice`` which is used for LVS using the Netgen tool.
+```bash
+netgen -batch lvs "rca_4bit.spice rca_4bit" "../synth/rca_4bit_synth.v rca_4bit" /home/manashjb/EDA/open_pdks/sky130/sky130A/libs.tech/netgen/sky130A_setup.tcl lvs_report.log
+```
+This automatically does the LVS and generates a log report file. In my case it passed the LVS and my circuits are identical before and after the layout design.
+
+![lvs](./Images/lvs.png)<br>
+
+## 6. GDSII Generation
+For GDSII file, Magic tool is used again. Before writing the GDS file, the standard cell GDS library was loaded so that the abstract LEF views could be replaced with full transistor-level layouts. Then rca_4bit module is loaded and the command for generation of GDS file is passed:
+```tcl
+gds read sky130_fd_sc_hs.gds
+load rca_4bit
+gds write rca_4bit.gds
+```
+These commands generates the ``rca_4bit.gds`` GDSII file. This file is then opened and visulaized using Klayout tool:
