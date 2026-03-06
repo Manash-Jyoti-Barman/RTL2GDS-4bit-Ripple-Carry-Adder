@@ -39,6 +39,7 @@ Both expressions are logically equivalent. In ASIC implementations, the majority
 - [4. Synthesis](#4-Synthesis)
 - [5. Floorplanning](#5-Floorplanning)
 - [6. DRC and LVS](#6-DRC-and-LVS)
+- [7. GDSII Generation](#7-GDSII-Generation)
 
 ## 1. Tools and PDK
 ### 1.1 Icarus Verilog
@@ -283,11 +284,11 @@ My final routed layout has:
 ![finalnotrack](./Images/finalnotrack.png)<br>
 
 ## 6. DRC and LVS
-**Design Rule Check (DRC)**
+* **Design Rule Check (DRC)**
 
 DRC verifies that the layout follows the fabrication rules specified by the technology. It checks constraints such as minimum wire width, spacing, and enclosure to ensure the design can be manufactured reliably.
 
-**Layout Versus Schematic (LVS)**
+* **Layout Versus Schematic (LVS)**
 
 LVS verifies that the generated layout matches the original schematic or synthesized netlist. It compares the extracted connections from the layout with the design netlist to ensure correct functionality and connectivity.
 
@@ -322,7 +323,7 @@ This automatically does the LVS and generates a log report file. In my case it p
 
 ![lvs](./Images/lvs.png)<br>
 
-## 6. GDSII Generation
+## 7. GDSII Generation
 For GDSII file, Magic tool is used again. Before writing the GDS file, the standard cell GDS library was loaded so that the abstract LEF views could be replaced with full transistor-level layouts. Then rca_4bit module is loaded and the command for generation of GDS file is passed:
 ```tcl
 gds read sky130_fd_sc_hs.gds
