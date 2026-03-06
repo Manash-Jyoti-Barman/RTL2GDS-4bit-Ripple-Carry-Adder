@@ -1,0 +1,22 @@
+read_liberty -lib /home/manashjb/OpenROAD-flow-scripts/flow/platforms/sky130hs/lib/sky130_fd_sc_hs__tt_025C_1v80.lib
+
+read_verilog ../rtl/full_adder.v
+read_verilog ../rtl/rca_4bit.v
+
+synth -top rca_4bit
+
+flatten
+
+abc -liberty /home/manashjb/OpenROAD-flow-scripts/flow/platforms/sky130hs/lib/sky130_fd_sc_hs__tt_025C_1v80.lib
+
+stat
+
+write_verilog rca_4bit_synth.v
+write_json rca_4bit.json
+
+# Generate SVG schematic of the synthesized design
+show -format svg -prefix rca_4bit
+
+# Generate Graphviz DOT file for the design
+show -format dot -prefix rca_4bit
+
